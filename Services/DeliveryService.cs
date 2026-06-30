@@ -111,6 +111,41 @@ public class DeliveryService : IDeliveryService
         return true;
     }
 
+    public Task<bool> SaveDeliveryOptionAsync(int orderId, string deliveryOption, string note)
+    {
+        if (!DeliveryOptions.All.Contains(deliveryOption))
+        {
+            return Task.FromResult(false);
+        }
+
+        var order = _orders.FirstOrDefault(existingOrder => existingOrder.Id == orderId);
+
+        if (order == null)
+        {
+            return Task.FromResult(false);
+        }
+
+        order.DeliveryOption = deliveryOption;
+        order.DeliveryNote = note.Trim();
+
+        return Task.FromResult(true);
+    }
+
+    public async Task<bool> MarkAsDeliveredAsync(int orderId, string deliveryOption, string note)
+    {
+        var optionSaved = await SaveDeliveryOptionAsync(orderId, deliveryOption, note);
+
+        if (!optionSaved)
+        {
+            return false;
+        }
+
+        var order = _orders.First(existingOrder => existingOrder.Id == orderId);
+        order.DeliveredAt = DateTime.Now;
+
+        return await UpdateOrderStatusAsync(orderId, DeliveryStatus.Delivered);
+    }
+
     private void MergeAdminOrders(List<DeliveryOrder> adminOrders)
     {
         foreach (var adminOrder in adminOrders)

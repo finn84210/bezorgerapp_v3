@@ -7,6 +7,10 @@
         <VerticalStackLayout Padding="20" Spacing="16">
             <Label Text="Leverroute" Style="{StaticResource PageTitle}" />
             <Label x:Name="RouteInfoLabel" Style="{StaticResource MutedText}" />
+            <Border Style="{StaticResource InfoPanel}">
+                <Label Text="Open de route, kies een bezorgoptie en zet de bestelling op afgeleverd zodra je klaar bent."
+                       Style="{StaticResource MutedText}" />
+            </Border>
 
             <VerticalStackLayout x:Name="RouteList" Spacing="12" />
         </VerticalStackLayout>
