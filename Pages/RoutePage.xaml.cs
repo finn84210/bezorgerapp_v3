@@ -8,6 +8,7 @@ namespace bezorgerapp_v3.Pages;
 public partial class RoutePage : ContentPage
 {
     private readonly IDeliveryService _deliveryService;
+    private DeliveryBus? _currentBus;
 
     public string BusNumber { get; set; } = string.Empty;
 
@@ -38,10 +39,12 @@ public partial class RoutePage : ContentPage
             return;
         }
 
-        RouteInfoLabel.Text = $"Bus {bus.Number} - {bus.Orders.Count} bestellingen";
+        _currentBus = bus;
+        var deliveredCount = bus.Orders.Count(order => order.Status == DeliveryStatus.Delivered);
+        RouteInfoLabel.Text = $"Bus {bus.Number} - {deliveredCount} van {bus.Orders.Count} bestellingen afgeleverd";
         RouteList.Clear();
 
-        foreach (var order in bus.Orders)
+        foreach (var order in bus.Orders.OrderBy(order => order.Status == DeliveryStatus.Delivered).ThenBy(order => order.Id))
         {
             RouteList.Add(CreateRouteCard(order));
         }
@@ -60,6 +63,7 @@ public partial class RoutePage : ContentPage
             if (statusPicker.SelectedItem is string status)
             {
                 await _deliveryService.UpdateOrderStatusAsync(order.Id, status);
+                await LoadRouteAsync();
             }
         };
 
@@ -92,6 +96,7 @@ public partial class RoutePage : ContentPage
             statusPicker.SelectedItem = DeliveryStatus.OnTheWay;
             await _deliveryService.UpdateOrderStatusAsync(order.Id, DeliveryStatus.OnTheWay);
             await DisplayAlertAsync("Status bijgewerkt", $"Bestelling #{order.Id} staat op onderweg.", "Ok");
+            await LoadRouteAsync();
         };
 
         var saveOptionButton = new Button
@@ -199,6 +204,20 @@ public partial class RoutePage : ContentPage
 
     private async void OnRouteDoneClicked(object? sender, EventArgs e)
     {
+        if (_currentBus != null && _currentBus.Orders.Any(order => order.Status != DeliveryStatus.Delivered))
+        {
+            var continueAnyway = await DisplayAlertAsync(
+                "Nog niet alles afgeleverd",
+                "Er staan nog bestellingen open. Wil je toch terug naar het overzicht?",
+                "Ja",
+                "Nee");
+
+            if (!continueAnyway)
+            {
+                return;
+            }
+        }
+
         await DisplayAlertAsync("Route klaar", "Je gaat terug naar het bestellingenoverzicht.", "Ok");
         await Shell.Current.GoToAsync("//orders");
     }

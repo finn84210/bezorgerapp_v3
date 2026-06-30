@@ -18,6 +18,13 @@ public partial class OrdersPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        if (!_workdayState.IsLoggedIn)
+        {
+            await Shell.Current.GoToAsync("//login");
+            return;
+        }
+
         await LoadOrdersAsync();
     }
 
@@ -30,12 +37,29 @@ public partial class OrdersPage : ContentPage
     private async Task LoadOrdersAsync()
     {
         var orders = await _deliveryService.GetOrdersAsync();
+        var visibleOrders = orders
+            .Where(order => order.Status != DeliveryStatus.Delivered)
+            .ToList();
 
         IntroLabel.Text = $"Goedemorgen {_workdayState.DriverName}. Kies een bestelling om je bus te starten.";
-        CountLabel.Text = $"{orders.Count} bestellingen";
+        CountLabel.Text = $"{visibleOrders.Count} bestellingen";
         OrdersList.Clear();
 
-        foreach (var order in orders)
+        if (!visibleOrders.Any())
+        {
+            OrdersList.Add(new Border
+            {
+                Style = (Style)Application.Current!.Resources["AppCard"],
+                Content = new Label
+                {
+                    Text = "Er staan geen bestellingen meer klaar. Je route is rustig.",
+                    Style = (Style)Application.Current.Resources["MutedText"]
+                }
+            });
+            return;
+        }
+
+        foreach (var order in visibleOrders)
         {
             OrdersList.Add(CreateOrderCard(order));
         }
