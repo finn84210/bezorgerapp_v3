@@ -1,0 +1,126 @@
+using bezorgerapp_v3.Data;
+using bezorgerapp_v3.Models;
+
+namespace bezorgerapp_v3.Services;
+
+public class DeliveryService : IDeliveryService
+{
+    private readonly IAdminDeliveryClient _adminClient;
+    private readonly List<DeliveryOrder> _orders;
+
+    public DeliveryService(IAdminDeliveryClient adminClient)
+    {
+        _adminClient = adminClient;
+        _orders = DeliveryTestData.CreateOrders();
+    }
+
+    public async Task<List<DeliveryOrder>> GetOrdersAsync()
+    {
+        try
+        {
+            var adminOrders = await _adminClient.GetPickedOrdersAsync();
+
+            if (adminOrders.Any())
+            {
+                MergeAdminOrders(adminOrders);
+            }
+        }
+        catch
+        {
+            // Als de adminpagina niet draait, blijft de app volledig klikbaar met testdata.
+        }
+
+        return _orders
+            .OrderBy(order => order.BusNumber)
+            .ThenBy(order => order.Id)
+            .ToList();
+    }
+
+    public async Task<DeliveryBus?> StartDeliveryAsync(int orderId, string driverName)
+    {
+        var order = _orders.FirstOrDefault(existingOrder => existingOrder.Id == orderId);
+
+        if (order == null)
+        {
+            return null;
+        }
+
+        if (order.AdminOrderId.HasValue)
+        {
+            await _adminClient.ClaimOrderAsync(order.AdminOrderId.Value, driverName);
+        }
+
+        return await GetBusAsync(order.BusNumber);
+    }
+
+    public Task<DeliveryBus?> GetBusAsync(int busNumber)
+    {
+        var busOrders = _orders
+            .Where(order => order.BusNumber == busNumber)
+            .OrderBy(order => order.Id)
+            .ToList();
+
+        if (!busOrders.Any())
+        {
+            return Task.FromResult<DeliveryBus?>(null);
+        }
+
+        return Task.FromResult<DeliveryBus?>(new DeliveryBus
+        {
+            Number = busNumber,
+            Orders = busOrders
+        });
+    }
+
+    public Task<bool> CheckPackagesAsync(int busNumber, List<int> checkedPackageIds)
+    {
+        var packages = _orders
+            .Where(order => order.BusNumber == busNumber)
+            .SelectMany(order => order.Packages)
+            .ToList();
+
+        foreach (var package in packages)
+        {
+            package.IsChecked = checkedPackageIds.Contains(package.Id);
+        }
+
+        return Task.FromResult(packages.All(package => package.IsChecked));
+    }
+
+    public async Task<bool> UpdateOrderStatusAsync(int orderId, string status)
+    {
+        if (!DeliveryStatus.All.Contains(status))
+        {
+            return false;
+        }
+
+        var order = _orders.FirstOrDefault(existingOrder => existingOrder.Id == orderId);
+
+        if (order == null)
+        {
+            return false;
+        }
+
+        order.Status = status;
+
+        if (order.AdminOrderId.HasValue)
+        {
+            await _adminClient.UpdateStatusAsync(order.AdminOrderId.Value, status);
+        }
+
+        return true;
+    }
+
+    private void MergeAdminOrders(List<DeliveryOrder> adminOrders)
+    {
+        foreach (var adminOrder in adminOrders)
+        {
+            if (_orders.Any(order => order.AdminOrderId == adminOrder.AdminOrderId))
+            {
+                continue;
+            }
+
+            _orders.Add(adminOrder);
+        }
+    }
+}

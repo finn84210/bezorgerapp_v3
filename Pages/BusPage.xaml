@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="bezorgerapp_v3.Pages.BusPage"
+             Title="Bus toegewezen">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Bus toegewezen" Style="{StaticResource PageTitle}" />
+            <Label Text="Je bus is gekoppeld aan de pakketten die je zo gaat controleren."
+                   Style="{StaticResource MutedText}" />
+
+            <Border Style="{StaticResource HeroCard}">
+                <VerticalStackLayout Spacing="12">
+                    <Label x:Name="BusLabel" Style="{StaticResource BigNumber}" />
+                    <Label x:Name="BusInfoLabel" Style="{StaticResource MutedText}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource AppCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Wat gebeurt er nu?" Style="{StaticResource CardTitle}" />
+                    <Label Text="Controleer eerst alle pakketten in je bus. Daarna start je pas de leverroute."
+                           Style="{StaticResource MutedText}" />
+                    <Button Text="Pakketten controleren"
+                            Style="{StaticResource PrimaryButton}"
+                            Clicked="OnCheckPackagesClicked" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

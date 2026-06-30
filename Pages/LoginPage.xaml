@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="bezorgerapp_v3.Pages.LoginPage"
+             Title="Inloggen">
+    <ScrollView>
+        <Grid Padding="24" RowDefinitions="Auto,*">
+            <VerticalStackLayout Grid.Row="0" Spacing="20" VerticalOptions="Center">
+                <Border Style="{StaticResource AppCard}">
+                    <VerticalStackLayout Spacing="18">
+                        <Label Text="Matrix Delivery"
+                               Style="{StaticResource EyebrowLabel}" />
+                        <Label Text="Start je bezorgdag"
+                               Style="{StaticResource PageTitle}" />
+                        <Label Text="Log in en volg stap voor stap je route, pakketten en leveringen."
+                               Style="{StaticResource MutedText}" />
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="E-mail of gebruikersnaam" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="UserNameEntry"
+                                   Placeholder="bijv. bezorger@matrix.nl"
+                                   Keyboard="Email" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Wachtwoord" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="PasswordEntry"
+                                   Placeholder="Wachtwoord"
+                                   IsPassword="True" />
+                        </VerticalStackLayout>
+
+                        <Label x:Name="ErrorLabel"
+                               IsVisible="False"
+                               Style="{StaticResource ErrorText}" />
+
+                        <Button Text="Inloggen"
+                                Style="{StaticResource PrimaryButton}"
+                                Clicked="OnLoginClicked" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>

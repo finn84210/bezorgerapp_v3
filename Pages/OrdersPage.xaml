@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="bezorgerapp_v3.Pages.OrdersPage"
+             Title="Bestellingen">
+    <RefreshView x:Name="OrdersRefreshView" Refreshing="OnRefreshing">
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="16">
+                <Label Text="Bestellingen overzicht" Style="{StaticResource PageTitle}" />
+                <Label x:Name="IntroLabel"
+                       Style="{StaticResource MutedText}" />
+
+                <Border Style="{StaticResource InfoPanel}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Vandaag" Style="{StaticResource EyebrowLabel}" />
+                            <Label x:Name="CountLabel" Style="{StaticResource StatNumber}" />
+                        </VerticalStackLayout>
+                        <Label Text="Stap 1 van 4"
+                               Grid.Column="1"
+                               Style="{StaticResource BadgeLabel}" />
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout x:Name="OrdersList" Spacing="12" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>
