@@ -1,17 +1,24 @@
 using System.Net.Http.Json;
 using bezorgerapp_v3.Models;
+using Microsoft.Maui.Devices;
 
 namespace bezorgerapp_v3.Services;
 
 public class AdminDeliveryClient : IAdminDeliveryClient
 {
-    private const string AdminApiBaseUrl = "http://localhost:5177";
     private readonly HttpClient _httpClient;
 
     public AdminDeliveryClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(AdminApiBaseUrl);
+        _httpClient.BaseAddress = new Uri(GetAdminApiBaseUrl());
+    }
+
+    private static string GetAdminApiBaseUrl()
+    {
+        return DeviceInfo.Platform == DevicePlatform.Android
+            ? "http://10.0.2.2:5177"
+            : "http://localhost:5177";
     }
 
     public async Task<List<DeliveryOrder>> GetPickedOrdersAsync()
@@ -31,11 +38,17 @@ public class AdminDeliveryClient : IAdminDeliveryClient
         });
     }
 
-    public Task UpdateStatusAsync(int adminOrderId, string status)
+    public async Task UpdateStatusAsync(int adminOrderId, string status)
     {
-        // De adminpagina heeft nu nog geen los endpoint voor statusupdates vanuit MAUI.
-        // Door deze methode alvast te maken, hoeft later alleen deze client aangepast te worden.
-        return Task.CompletedTask;
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/delivery/orders/{adminOrderId}/status")
+        {
+            Content = JsonContent.Create(new
+            {
+                status
+            })
+        };
+
+        await _httpClient.SendAsync(request);
     }
 
     private static DeliveryOrder MapAdminOrder(AdminDeliveryOrderDto order, int index)

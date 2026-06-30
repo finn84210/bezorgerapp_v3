@@ -13,6 +13,26 @@
             </Border>
 
             <VerticalStackLayout x:Name="RouteList" Spacing="12" />
+
+            <Border Style="{StaticResource AppCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Route navigatie" Style="{StaticResource CardTitle}" />
+                    <Label Text="Je kunt altijd terug naar de vorige stap of opnieuw naar het overzicht."
+                           Style="{StaticResource MutedText}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="10">
+                        <Button Text="Terug naar pakketten"
+                                Clicked="OnBackToPackagesClicked" />
+                        <Button Grid.Column="1"
+                                Text="Naar bestellingen"
+                                Clicked="OnBackToOrdersClicked" />
+                        <Button Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Text="Route klaar"
+                                Style="{StaticResource PrimaryButton}"
+                                Clicked="OnRouteDoneClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

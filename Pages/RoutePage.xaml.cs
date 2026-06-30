@@ -186,4 +186,20 @@ public partial class RoutePage : ContentPage
         // Launcher opent de standaard browser of Google Maps-app als die op het apparaat staat.
         await Launcher.OpenAsync(mapsUrl);
     }
+
+    private async void OnBackToPackagesClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"packages?busNumber={BusNumber}");
+    }
+
+    private async void OnBackToOrdersClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//orders");
+    }
+
+    private async void OnRouteDoneClicked(object? sender, EventArgs e)
+    {
+        await DisplayAlertAsync("Route klaar", "Je gaat terug naar het bestellingenoverzicht.", "Ok");
+        await Shell.Current.GoToAsync("//orders");
+    }
 }
