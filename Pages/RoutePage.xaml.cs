@@ -130,6 +130,12 @@ public partial class RoutePage : ContentPage
             await LoadRouteAsync();
         };
 
+        var issueButton = new Button
+        {
+            Text = order.HasRouteIssue ? "Probleem aanpassen" : "Probleem melden"
+        };
+        issueButton.Clicked += async (_, _) => await ReportRouteIssueAsync(order.Id);
+
         var actionGrid = new Grid
         {
             ColumnDefinitions =
@@ -140,6 +146,7 @@ public partial class RoutePage : ContentPage
             RowDefinitions =
             {
                 new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto }
             },
             ColumnSpacing = 10,
@@ -149,6 +156,8 @@ public partial class RoutePage : ContentPage
         actionGrid.Add(onTheWayButton, 1, 0);
         actionGrid.Add(saveOptionButton, 0, 1);
         actionGrid.Add(deliveredButton, 1, 1);
+        actionGrid.Add(issueButton, 0, 2);
+        Grid.SetColumnSpan(issueButton, 2);
 
         var layout = new VerticalStackLayout { Spacing = 10 };
         layout.Add(new Label { Text = $"Bestelling #{order.Id}", Style = (Style)Application.Current!.Resources["CardTitle"] });
@@ -156,6 +165,7 @@ public partial class RoutePage : ContentPage
         layout.Add(new Label { Text = order.Address, Style = (Style)Application.Current.Resources["MutedText"] });
         layout.Add(new Label { Text = $"{order.Packages.Count} pakketten", Style = (Style)Application.Current.Resources["MutedText"] });
         layout.Add(CreateDeliveredLabel(order));
+        layout.Add(CreateRouteIssueLabel(order));
         layout.Add(new Label { Text = "Status", Style = (Style)Application.Current.Resources["FieldLabel"] });
         layout.Add(statusPicker);
         layout.Add(new Label { Text = "Bezorgoptie", Style = (Style)Application.Current.Resources["FieldLabel"] });
@@ -167,6 +177,19 @@ public partial class RoutePage : ContentPage
         {
             Style = (Style)Application.Current.Resources["AppCard"],
             Content = layout
+        };
+    }
+
+    private static Label CreateRouteIssueLabel(DeliveryOrder order)
+    {
+        var text = order.HasRouteIssue
+            ? $"Probleem gemeld: {order.RouteIssueDescription}"
+            : "Geen probleem gemeld";
+
+        return new Label
+        {
+            Text = text,
+            Style = (Style)Application.Current!.Resources[order.HasRouteIssue ? "ErrorText" : "MutedText"]
         };
     }
 
@@ -190,6 +213,31 @@ public partial class RoutePage : ContentPage
 
         // Launcher opent de standaard browser of Google Maps-app als die op het apparaat staat.
         await Launcher.OpenAsync(mapsUrl);
+    }
+
+    private async Task ReportRouteIssueAsync(int orderId)
+    {
+        var issue = await DisplayActionSheetAsync(
+            "Welk probleem wil je melden?",
+            "Annuleren",
+            null,
+            RouteIssueOptions.All);
+
+        if (string.IsNullOrWhiteSpace(issue) || issue == "Annuleren")
+        {
+            return;
+        }
+
+        var saved = await _deliveryService.ReportRouteIssueAsync(orderId, issue);
+
+        if (!saved)
+        {
+            await DisplayAlertAsync("Niet gelukt", "Het probleem kon niet opgeslagen worden.", "Ok");
+            return;
+        }
+
+        await DisplayAlertAsync("Probleem gemeld", "Het probleem is opgeslagen bij deze bestelling.", "Ok");
+        await LoadRouteAsync();
     }
 
     private async void OnBackToPackagesClicked(object? sender, EventArgs e)

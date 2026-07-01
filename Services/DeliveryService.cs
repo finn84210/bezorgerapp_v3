@@ -105,6 +105,21 @@ public class DeliveryService : IDeliveryService
         return Task.FromResult(true);
     }
 
+    public Task<bool> ReportRouteIssueAsync(int orderId, string issueDescription)
+    {
+        var order = _orders.FirstOrDefault(existingOrder => existingOrder.Id == orderId);
+
+        if (order == null)
+        {
+            return Task.FromResult(false);
+        }
+
+        order.HasRouteIssue = true;
+        order.RouteIssueDescription = issueDescription.Trim();
+
+        return Task.FromResult(true);
+    }
+
     public async Task<bool> UpdateOrderStatusAsync(int orderId, string status)
     {
         if (!DeliveryStatus.All.Contains(status))

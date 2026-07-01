@@ -14,6 +14,8 @@ public interface IDeliveryService
 
     Task<bool> ReportPackageIssueAsync(int packageId, string issueDescription);
 
+    Task<bool> ReportRouteIssueAsync(int orderId, string issueDescription);
+
     Task<bool> UpdateOrderStatusAsync(int orderId, string status);
 
     Task<bool> SaveDeliveryOptionAsync(int orderId, string deliveryOption, string note);

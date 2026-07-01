@@ -18,6 +18,10 @@ public class DeliveryOrder
 
     public DateTime? DeliveredAt { get; set; }
 
+    public bool HasRouteIssue { get; set; }
+
+    public string RouteIssueDescription { get; set; } = string.Empty;
+
     public int BusNumber { get; set; }
 
     public List<DeliveryPackage> Packages { get; set; } = new();
