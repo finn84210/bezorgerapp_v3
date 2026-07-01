@@ -9,4 +9,8 @@ public class DeliveryPackage
     public string Description { get; set; } = string.Empty;
 
     public bool IsChecked { get; set; }
+
+    public bool HasIssue { get; set; }
+
+    public string IssueDescription { get; set; } = string.Empty;
 }

@@ -84,7 +84,25 @@ public class DeliveryService : IDeliveryService
             package.IsChecked = checkedPackageIds.Contains(package.Id);
         }
 
-        return Task.FromResult(packages.All(package => package.IsChecked));
+        return Task.FromResult(packages.All(package => package.IsChecked || package.HasIssue));
+    }
+
+    public Task<bool> ReportPackageIssueAsync(int packageId, string issueDescription)
+    {
+        var package = _orders
+            .SelectMany(order => order.Packages)
+            .FirstOrDefault(existingPackage => existingPackage.Id == packageId);
+
+        if (package == null)
+        {
+            return Task.FromResult(false);
+        }
+
+        package.IsChecked = false;
+        package.HasIssue = true;
+        package.IssueDescription = issueDescription.Trim();
+
+        return Task.FromResult(true);
     }
 
     public async Task<bool> UpdateOrderStatusAsync(int orderId, string status)

@@ -7,6 +7,8 @@
         <VerticalStackLayout Padding="20" Spacing="16">
             <Label Text="Pakketten controleren" Style="{StaticResource PageTitle}" />
             <Label x:Name="ProgressLabel" Style="{StaticResource MutedText}" />
+            <Label Text="Vink een pakket af als het klopt. Meld een fout als een pakket ontbreekt, beschadigd is of niet bij deze bus hoort."
+                   Style="{StaticResource MutedText}" />
 
             <ProgressBar x:Name="PackageProgress" Progress="0" />
 
