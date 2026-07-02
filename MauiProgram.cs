@@ -1,4 +1,4 @@
-using bezorgerapp_v3.Pages;
+﻿using bezorgerapp_v3.Pages;
 using bezorgerapp_v3.Services;
 using Microsoft.Extensions.Logging;
 
@@ -34,3 +34,4 @@ public static class MauiProgram
         return builder.Build();
     }
 }
+// laatste aanpassingen gemaakt.

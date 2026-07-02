@@ -1,4 +1,4 @@
-bin/
+﻿bin/
 obj/
 .vs/
 .vscode/
@@ -18,3 +18,4 @@ ARM64/
 # OS files
 Thumbs.db
 .DS_Store
+# laatste aanpassingen gemaakt.

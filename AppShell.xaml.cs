@@ -1,4 +1,4 @@
-using bezorgerapp_v3.Pages;
+﻿using bezorgerapp_v3.Pages;
 
 namespace bezorgerapp_v3;
 
@@ -13,3 +13,4 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("route", typeof(RoutePage));
     }
 }
+// laatste aanpassingen gemaakt.
